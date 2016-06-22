@@ -255,7 +255,24 @@ public class BinderHelper {
 			Mappings mappings) {
 		//associated entity only used for more precise exception, yuk!
 		if ( columns[0].isImplicit() || StringHelper.isNotEmpty( columns[0].getMappedBy() ) ) return;
-		int fkEnum = Ejb3JoinColumn.checkReferencedColumnsType( columns, ownerEntity, mappings );
+
+		// DEBUGGING [KRWJ]
+		int fkEnum;
+		try {
+			fkEnum = Ejb3JoinColumn.checkReferencedColumnsType( columns, ownerEntity, mappings );
+		} catch(RuntimeException e) {
+			System.out.println("Columns =");
+			for (int i = 0; i < columns.length; i++) {
+				System.out.printf("  %d. %s\n", i, columns[i].toString());
+			}
+			System.out.println("ownerEntity = " + ownerEntity);
+			System.out.println("associatedEntity = " + associatedEntity);
+			System.out.println("value = " + value);
+			System.out.println("inverse = " + inverse);
+			System.out.println("mappings = " + mappings);
+			throw e;
+		}
+
 		PersistentClass associatedClass = columns[0].getPropertyHolder() != null ?
 				columns[0].getPropertyHolder().getPersistentClass() :
 				null;
